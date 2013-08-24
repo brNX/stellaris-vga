@@ -37,20 +37,7 @@ static uint8_t pattern[]={0xF,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x0,0x1,0x2,0x3,0x4,0x
 // The control table used by the uDMA controller.  This table must be aligned to a 1024 byte boundary.
 uint8_t ui8ControlTable[1024] __attribute__ ((aligned(1024)));
 
-int vsyncbit=GPIO_PIN_0;
-int hsyncbit=GPIO_PIN_7;
-
-#define horizontalBytes  20  // 160 pixels wide
 #define verticalPixels  480  // 480 pixels high
-
-#define screenFontHeight 8
-#define screenFontWidth  8
-
-#define verticalLines (verticalPixels / screenFontHeight / 2)  // double-height characters
-#define horizontalPixels  (horizontalBytes * screenFontWidth)
-
-#define verticalBackPorchLines  10  // includes sync pulse?
-#define verticalFrontPorchLines (525 - verticalBackPorchLines)
 
 volatile int vLine;
 volatile int messageLine;

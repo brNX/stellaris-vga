@@ -79,4 +79,31 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>utils</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>utils/cpu_usage.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/mnt/D/cenas_ARM/stellaris/utils/cpu_usage.c</locationURI>
+		</link>
+		<link>
+			<name>utils/cpu_usage.h</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/mnt/D/cenas_ARM/stellaris/utils/cpu_usage.h</locationURI>
+		</link>
+		<link>
+			<name>utils/uartstdio.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/mnt/D/cenas_ARM/stellaris/utils/uartstdio.c</locationURI>
+		</link>
+		<link>
+			<name>utils/uartstdio.h</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/mnt/D/cenas_ARM/stellaris/utils/uartstdio.h</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

@@ -17,8 +17,8 @@ extern int main(void);
 
 extern void VsyncHandler(void);
 extern void HsyncHandler(void);
-extern void Timer0Handler(void);
-extern void uDMAErrorHandler(void);
+extern void SysTickHandler(void);
+
 
 //*****************************************************************************
 //
@@ -89,7 +89,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // ADC Sequence 2
     IntDefaultHandler,                      // ADC Sequence 3
     IntDefaultHandler,                      // Watchdog timer 0
-    Timer0Handler,		                	// Timer 0 subtimer A
+    IntDefaultHandler,		                // Timer 0 subtimer A
     IntDefaultHandler,                      // Timer 0 subtimer B
     IntDefaultHandler,                      // Timer 1 subtimer A
     IntDefaultHandler,                      // Timer 1 subtimer B

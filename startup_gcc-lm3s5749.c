@@ -80,16 +80,16 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // SSI0 Rx and Tx
     IntDefaultHandler,                      // I2C0 Master and Slave
     IntDefaultHandler,                      // PWM Fault
-    VsyncHandler,                      		// PWM Generator 0
-    IntDefaultHandler,                      // PWM Generator 1
-    HsyncHandler,                      		// PWM Generator 2
+    VsyncHandler,                      	   // PWM Generator 0
+    HsyncHandler,                     		   // PWM Generator 1
+    IntDefaultHandler,                      // PWM Generator 2
     IntDefaultHandler,                      // QEI 0
     IntDefaultHandler,                      // ADC Sequence 0
     IntDefaultHandler,                      // ADC Sequence 1
     IntDefaultHandler,                      // ADC Sequence 2
     IntDefaultHandler,                      // ADC Sequence 3
     IntDefaultHandler,                      // Watchdog timer 0
-    IntDefaultHandler,		                // Timer 0 subtimer A
+    IntDefaultHandler,					  // Timer 0 subtimer A
     IntDefaultHandler,                      // Timer 0 subtimer B
     IntDefaultHandler,                      // Timer 1 subtimer A
     IntDefaultHandler,                      // Timer 1 subtimer B
@@ -102,7 +102,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // FLASH Control
     IntDefaultHandler,                      // GPIO Port F
     IntDefaultHandler,                      // GPIO Port G
-    IntDefaultHandler,                    	// GPIO Port H
+    IntDefaultHandler,                      // GPIO Port H
     IntDefaultHandler,                      // Reserved
     IntDefaultHandler,                      // SSI1 Rx and Tx
     IntDefaultHandler,                      // Timer 3 subtimer A
@@ -117,7 +117,7 @@ void (* const g_pfnVectors[])(void) =
 	IntDefaultHandler,                      // USB
 	IntDefaultHandler,                      // PWM Generator 3
 	IntDefaultHandler,                      // uDMA Software
-	IntDefaultHandler                    	// uDMA Error
+	IntDefaultHandler                 	  // uDMA Error
 	
 };
 

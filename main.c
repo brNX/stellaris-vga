@@ -3,6 +3,7 @@
 #include <inc/hw_ints.h>
 #include <inc/hw_memmap.h>
 #include <inc/hw_gpio.h>
+#include <inc/hw_pwm.h>
 #include <driverlib/rom.h>
 #include <driverlib/rom_map.h>
 #include <driverlib/debug.h>
@@ -15,6 +16,7 @@
 #include <stdint.h>
 #include "utils/ustdlib.h"
 #include "utils/uartstdio.h"
+#include "kakariko-map.h"
 
 static uint8_t pattern[213]={1, 2, 3, 6, 2, 5, 6, 5, 2, 5, 0, 1, 4, 4, 6, 3, 6, 2, 7, 0, 6, 1, 6, 3, 2, 5, 2, 1,
 		5, 5, 1, 1, 1, 4, 6, 5, 1, 2, 0, 0, 0, 6, 3, 1, 6, 2, 4, 7, 7, 5, 4, 1, 1, 7, 3, 6, 4, 2, 1, 0, 0, 4, 1,
@@ -27,51 +29,51 @@ static uint8_t pattern[213]={1, 2, 3, 6, 2, 5, 6, 5, 2, 5, 0, 1, 4, 4, 6, 3, 6, 
 
 
 
-#define horizontalBytes  20  // 160 pixels wide
-#define verticalPixels  480  // 480 pixels high
-
-#define screenFontHeight 8
-#define screenFontWidth  8
-
 volatile int vLine;
+volatile int backPorchLinesToGo;
+
+#define VPixels 480
+#define VBackPorchLines 35
 
 
 //PWM Gen 0
 void VsyncHandler(){
-
-	PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
-
+	HWREG(PWM_BASE +  PWM_GEN_0 + PWM_O_X_ISC) = PWM_INT_CNT_AD; //PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
+	HWREG(PWM_BASE + PWM_GEN_1 + PWM_O_X_INTEN) |= PWM_INT_CNT_AU; //PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AU);
+	backPorchLinesToGo = VBackPorchLines;
 	vLine = 0;
 }
 
 
 //PWM Gen 1
 void HsyncHandler(){
-	PWMGenIntClear(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
 
+	HWREG(PWM_BASE +  PWM_GEN_1 + PWM_O_X_ISC) = PWM_INT_CNT_AU;  //PWMGenIntClear(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
 	//unsigned int indexb=vLine/3;
 
-	// if all lines done, do the front porch
-	if (vLine >= verticalPixels)
+	asm volatile("nop");
+
+	// after vsync we do the back porch
+	if (backPorchLinesToGo)
+	{
+		backPorchLinesToGo--;
 		return;
+	}
 
 	asm volatile("nop");
+
+	// if all lines done, do the front porch
+	if (vLine >= VPixels){
+		HWREG(PWM_BASE +  PWM_GEN_1  + PWM_O_X_INTEN) &= ~(PWM_INT_CNT_AU); //PWMGenIntTrigDisable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AU);
+		return;
+	}
+
 	asm volatile("nop");
-	asm volatile("nop");
-	asm volatile("nop");
+
 
 	#include "loop.h"
 
-
-	//213 pixels
-	/*for (int i=0;i<213;i++){
-		HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = pattern[i];
-		HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = pattern[i];
-		HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = pattern[i];
-
-	}*/
-
-	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = 0; // drop back to black
+    HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = 0; // drop back to black
 
 
 	/*uDMAChannelTransferSet(UDMA_CHANNEL_SW | UDMA_PRI_SELECT,
@@ -150,10 +152,10 @@ int main(void)
 	//
 	while(1)
 	{
-		GPIOPinWrite(GPIO_PORTE_BASE,GPIO_PIN_0,0);
+		HWREG(GPIO_PORTE_BASE + GPIO_O_DATA + (GPIO_PIN_0 << 2)) = 0;
 		SysCtlDelay(500 * ulClockMS);
 
-		GPIOPinWrite(GPIO_PORTE_BASE,GPIO_PIN_0,GPIO_PIN_0);
+		HWREG(GPIO_PORTE_BASE + GPIO_O_DATA + (GPIO_PIN_0 << 2)) = GPIO_PIN_0;
 		SysCtlDelay(500 * ulClockMS);
 	}
 }

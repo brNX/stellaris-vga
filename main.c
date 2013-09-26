@@ -30,7 +30,6 @@ static uint8_t pattern[213]={1, 2, 3, 6, 2, 5, 6, 5, 2, 5, 0, 1, 4, 4, 6, 3, 6, 
 
 
 volatile int vLine;
-volatile int backPorchLinesToGo;
 
 #define VPixels 480
 #define VBackPorchLines 35
@@ -38,25 +37,20 @@ volatile int backPorchLinesToGo;
 
 //PWM Gen 0
 void VsyncHandler(){
-	HWREG(PWM_BASE +  PWM_GEN_0 + PWM_O_X_ISC) = PWM_INT_CNT_AD; //PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
-	HWREG(PWM_BASE + PWM_GEN_1 + PWM_O_X_INTEN) |= PWM_INT_CNT_AU; //PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AU);
-	backPorchLinesToGo = VBackPorchLines;
-	vLine = 0;
+	HWREG(PWM_BASE + PWM_GEN_0 + PWM_O_X_ISC) = PWM_INT_CNT_AD; //PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
+	//PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
+	vLine = -2;
 }
 
 
 //PWM Gen 1
 void HsyncHandler(){
 
-	HWREG(PWM_BASE +  PWM_GEN_1 + PWM_O_X_ISC) = PWM_INT_CNT_AU;  //PWMGenIntClear(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
+	HWREG(PWM_BASE +  PWM_GEN_1 + PWM_O_X_ISC) = PWM_INT_CNT_ZERO;  //PWMGenIntClear(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_ZERO);
+	//PWMGenIntClear(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_ZERO);
 	//unsigned int indexb=vLine/3;
-
-	asm volatile("nop");
-
-	// after vsync we do the back porch
-	if (backPorchLinesToGo)
-	{
-		backPorchLinesToGo--;
+	if (vLine <0){
+		vLine++;
 		return;
 	}
 
@@ -64,7 +58,8 @@ void HsyncHandler(){
 
 	// if all lines done, do the front porch
 	if (vLine >= VPixels){
-		HWREG(PWM_BASE +  PWM_GEN_1  + PWM_O_X_INTEN) &= ~(PWM_INT_CNT_AU); //PWMGenIntTrigDisable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AU);
+		HWREG(PWM_BASE +  PWM_GEN_1  + PWM_O_X_INTEN) &= ~(PWM_INT_CNT_ZERO); //PWMGenIntTrigDisable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AD);
+		//PWMGenIntTrigDisable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AD);
 		return;
 	}
 
@@ -75,14 +70,20 @@ void HsyncHandler(){
 
     HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = 0; // drop back to black
 
-
-	/*uDMAChannelTransferSet(UDMA_CHANNEL_SW | UDMA_PRI_SELECT,
-			UDMA_MODE_AUTO,pattern+(indexb*160), (void *)(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF<< 2)) , 160);
-	uDMAChannelEnable(UDMA_CHANNEL_SW);
-	uDMAChannelRequest(UDMA_CHANNEL_SW);*/
-
 	// this line done
 	vLine++;
+}
+
+//PWM Gen 2
+void FrameHandler(){
+	HWREG(PWM_BASE + PWM_GEN_2 + PWM_O_X_ISC) = PWM_INT_CNT_AD;    //PWMGenIntClear(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
+	//PWMGenIntClear(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
+	// do something , prepare tiles, etc...
+
+	//enable hsync interrupt
+	HWREG(PWM_BASE + PWM_GEN_1 + PWM_O_X_INTEN) |= PWM_INT_CNT_ZERO; //PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AD);
+	//PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AD);
+
 }
 
 
@@ -115,17 +116,22 @@ int main(void)
 
 	//setup pwm for vsync and hsync
 	MAP_SysCtlPWMClockSet(SYSCTL_PWMDIV_16);
+
 	MAP_PWMGenConfigure(PWM_BASE,PWM_GEN_0,PWM_GEN_MODE_DOWN|PWM_GEN_MODE_NO_SYNC);
 	MAP_PWMGenConfigure(PWM_BASE,PWM_GEN_1,PWM_GEN_MODE_DOWN|PWM_GEN_MODE_NO_SYNC);
 	MAP_PWMGenConfigure(PWM_BASE,PWM_GEN_2,PWM_GEN_MODE_DOWN|PWM_GEN_MODE_NO_SYNC);
+
 	MAP_PWMGenPeriodSet(PWM_BASE, PWM_GEN_0,0xcb6a);
-	MAP_PWMGenPeriodSet(PWM_BASE, PWM_GEN_1, 0x63);
-	MAP_PWMGenPeriodSet(PWM_BASE, PWM_GEN_2, 0x63);
+	MAP_PWMGenPeriodSet(PWM_BASE, PWM_GEN_1,0x63);
+	MAP_PWMGenPeriodSet(PWM_BASE, PWM_GEN_2,0xcb6a);
+
 	MAP_PWMPulseWidthSet(PWM_BASE, PWM_OUT_0, 199);
 	MAP_PWMPulseWidthSet(PWM_BASE, PWM_OUT_2, 12);
-	MAP_PWMPulseWidthSet(PWM_BASE, PWM_OUT_4, 16);
-	MAP_PWMOutputState(PWM_BASE, PWM_OUT_0_BIT, true);
-	MAP_PWMOutputState(PWM_BASE, PWM_OUT_2_BIT, true);
+	MAP_PWMPulseWidthSet(PWM_BASE, PWM_OUT_4, 3300);
+
+	MAP_PWMOutputState(PWM_BASE, PWM_OUT_0_BIT, true); //Vsync pulse
+	MAP_PWMOutputState(PWM_BASE, PWM_OUT_2_BIT, true); //hsync pulse
+
 	MAP_PWMGenEnable(PWM_BASE, PWM_GEN_0);
 	MAP_PWMGenEnable(PWM_BASE, PWM_GEN_1);
 	MAP_PWMGenEnable(PWM_BASE, PWM_GEN_2);
@@ -136,12 +142,15 @@ int main(void)
 	//
 	IntMasterEnable();
 	PWMIntEnable(PWM_BASE, PWM_INT_GEN_0);
+	PWMIntEnable(PWM_BASE, PWM_INT_GEN_1);
 	PWMIntEnable(PWM_BASE, PWM_INT_GEN_2);
 
 	//trigger when matched counting down
 	PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
+	//PWMGenIntTrigDisable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AD);
 	PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
 	IntEnable(INT_PWM0);
+	IntEnable(INT_PWM1);
 	IntEnable(INT_PWM2);
 	MAP_PWMSyncTimeBase(PWM_BASE, PWM_GEN_0 | PWM_GEN_1 | PWM_GEN_2);
 

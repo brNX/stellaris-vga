@@ -17,7 +17,7 @@ extern int main(void);
 
 extern void VsyncHandler(void);
 extern void HsyncHandler(void);
-extern void SysTickHandler(void);
+extern void FrameHandler(void);
 
 
 //*****************************************************************************
@@ -82,7 +82,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // PWM Fault
     VsyncHandler,                      	   // PWM Generator 0
     HsyncHandler,                     		   // PWM Generator 1
-    IntDefaultHandler,                      // PWM Generator 2
+    FrameHandler,                      	   // PWM Generator 2
     IntDefaultHandler,                      // QEI 0
     IntDefaultHandler,                      // ADC Sequence 0
     IntDefaultHandler,                      // ADC Sequence 1

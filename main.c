@@ -1,3 +1,13 @@
+/*
+ * main-old.c
+ *
+ *  Created on: Sep 27, 2013
+ *      Author: bgouveia
+ */
+
+
+
+
 #include <inc/hw_types.h>
 #include <inc/hw_timer.h>
 #include <inc/hw_ints.h>
@@ -18,29 +28,27 @@
 #include "utils/uartstdio.h"
 #include "kakariko-map.h"
 
-static uint8_t pattern[213]={1, 2, 3, 6, 2, 5, 6, 5, 2, 5, 0, 1, 4, 4, 6, 3, 6, 2, 7, 0, 6, 1, 6, 3, 2, 5, 2, 1,
-		5, 5, 1, 1, 1, 4, 6, 5, 1, 2, 0, 0, 0, 6, 3, 1, 6, 2, 4, 7, 7, 5, 4, 1, 1, 7, 3, 6, 4, 2, 1, 0, 0, 4, 1,
-		2, 7, 0, 7, 4, 1, 1, 3, 4, 4, 1, 3, 3, 1, 2, 7, 3, 5, 7, 2, 4, 6, 1, 6, 7, 3, 2, 6, 1, 1, 3, 3, 3, 6, 2,
-		7, 3, 0, 2, 3, 1, 0, 6, 2, 3, 0, 2, 6, 5, 0, 3, 7, 6, 2, 6, 2, 6, 4, 0, 4, 1, 3, 6, 0, 5, 3, 7, 2, 7, 1,
-		7, 4, 7, 0, 3, 1, 2, 1, 7, 4, 7, 6, 3, 7, 1, 5, 1, 4, 4, 3, 3, 1, 4, 5, 4, 4, 2, 0, 3, 1, 0, 6, 3, 7, 5,
-		6, 3, 3, 2, 0, 2, 3, 4, 5, 7, 4, 6, 5, 3, 6, 6, 1, 2, 7, 6, 5, 4, 6, 0, 6, 1, 1, 1, 2, 7, 1, 1, 6, 1, 0,
-		0, 5, 7, 0, 6, 3, 7, 5, 0, 2
-};
+#define TILEWIDTH 16
+#define TILEHEIGHT 16
+#define TILEOFFSET TILEWIDTH*TILEHEIGHT
 
+#define MAPWIDTH 16 //16*16 = 256 pixels
+#define MAPHEIGHT 15 //16*15 = 240 pixels
 
 
 volatile int vLine;
+volatile int tileIndex;
 
 #define VPixels 480
 #define VBackPorchLines 35
 
 
 //PWM Gen 0
-void VsyncHandler(){
-	HWREG(PWM_BASE + PWM_GEN_0 + PWM_O_X_ISC) = PWM_INT_CNT_AD; //PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
-	//PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
-	vLine = -2;
-}
+//void VsyncHandler(){
+//	HWREG(PWM_BASE + PWM_GEN_0 + PWM_O_X_ISC) = PWM_INT_CNT_AD; //PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
+//	//PWMGenIntClear(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
+//	vLine = -2;
+//}
 
 
 //PWM Gen 1
@@ -48,13 +56,11 @@ void HsyncHandler(){
 
 	HWREG(PWM_BASE +  PWM_GEN_1 + PWM_O_X_ISC) = PWM_INT_CNT_ZERO;  //PWMGenIntClear(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_ZERO);
 	//PWMGenIntClear(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_ZERO);
-	//unsigned int indexb=vLine/3;
+
 	if (vLine <0){
 		vLine++;
 		return;
 	}
-
-	asm volatile("nop");
 
 	// if all lines done, do the front porch
 	if (vLine >= VPixels){
@@ -63,12 +69,929 @@ void HsyncHandler(){
 		return;
 	}
 
+	const uint8_t * tilesrowsadress[MAPWIDTH];
+
+	int indexb=vLine>>1;  //divide 480 /2 to get 240 height resolution
+	uint8_t * mapindex= &kakariko_kakarikovillage[(indexb/TILEHEIGHT)*MAPWIDTH]; //get first tile from current row
+	int tilerowoffset = indexb%TILEHEIGHT; //get rowoffset in current tile
+
+	for (unsigned int i = 0;i<MAPWIDTH;i+=2){
+		int currenttilerow= (*mapindex*TILEOFFSET)+(tilerowoffset*TILEWIDTH);
+		tilesrowsadress[i]=&kakariko[currenttilerow];
+		mapindex++; //increment mapindex for next tile
+		currenttilerow= (*mapindex*TILEOFFSET)+(tilerowoffset*TILEWIDTH);
+	    tilesrowsadress[i+1]=&kakariko[currenttilerow];
+	    mapindex++; //increment mapindex for next tile
+	}
+
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
 	asm volatile("nop");
 
 
-	#include "loop.h"
+	const uint8_t * currentbyte =  tilesrowsadress[0];
 
-    HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = 0; // drop back to black
+	//tile 0
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[1];
+	asm volatile("nop");
+
+	//tile 1
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[2];
+	asm volatile("nop");
+
+	//tile 2
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[3];
+	asm volatile("nop");
+
+	//tile 3
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[4];
+	asm volatile("nop");
+
+	//tile 4
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[5];
+	asm volatile("nop");
+
+	//tile 5
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[6];
+	asm volatile("nop");
+
+	//tile 6
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[7];
+	asm volatile("nop");
+
+	//tile 7
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[8];
+	asm volatile("nop");
+
+	//tile 8
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[9];
+	asm volatile("nop");
+
+	//tile 9
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[10];
+	asm volatile("nop");
+
+	//tile 10
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[11];
+	asm volatile("nop");
+
+	//tile 11
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[12];
+	asm volatile("nop");
+
+	//tile 12
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[13];
+	asm volatile("nop");
+
+	//tile 13
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[14];
+	asm volatile("nop");
+
+	//tile 14
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte =  tilesrowsadress[15];
+	asm volatile("nop");
+
+	//tile 15
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	currentbyte++;
+	asm volatile("nop");asm volatile("nop");
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = *currentbyte;
+	asm volatile("nop");
+	asm volatile("nop");
+
+
+	HWREG(GPIO_PORTB_AHB_BASE + GPIO_O_DATA + (0xFF << 2)) = 0; // drop back to black
 
 	// this line done
 	vLine++;
@@ -79,7 +1002,7 @@ void FrameHandler(){
 	HWREG(PWM_BASE + PWM_GEN_2 + PWM_O_X_ISC) = PWM_INT_CNT_AD;    //PWMGenIntClear(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
 	//PWMGenIntClear(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
 	// do something , prepare tiles, etc...
-
+	vLine = -2;
 	//enable hsync interrupt
 	HWREG(PWM_BASE + PWM_GEN_1 + PWM_O_X_INTEN) |= PWM_INT_CNT_ZERO; //PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AD);
 	//PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AD);
@@ -141,15 +1064,15 @@ int main(void)
 	// Enable processor interrupts.
 	//
 	IntMasterEnable();
-	PWMIntEnable(PWM_BASE, PWM_INT_GEN_0);
+	//PWMIntEnable(PWM_BASE, PWM_INT_GEN_0);
 	PWMIntEnable(PWM_BASE, PWM_INT_GEN_1);
 	PWMIntEnable(PWM_BASE, PWM_INT_GEN_2);
 
 	//trigger when matched counting down
-	PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
+	//PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_0, PWM_INT_CNT_AD);
 	//PWMGenIntTrigDisable(PWM_BASE, PWM_GEN_1, PWM_INT_CNT_AD);
 	PWMGenIntTrigEnable(PWM_BASE, PWM_GEN_2, PWM_INT_CNT_AD);
-	IntEnable(INT_PWM0);
+	//IntEnable(INT_PWM0);
 	IntEnable(INT_PWM1);
 	IntEnable(INT_PWM2);
 	MAP_PWMSyncTimeBase(PWM_BASE, PWM_GEN_0 | PWM_GEN_1 | PWM_GEN_2);
@@ -161,10 +1084,10 @@ int main(void)
 	//
 	while(1)
 	{
-		HWREG(GPIO_PORTE_BASE + GPIO_O_DATA + (GPIO_PIN_0 << 2)) = 0;
+		/*HWREG(GPIO_PORTE_BASE + GPIO_O_DATA + (GPIO_PIN_0 << 2)) = 0;
 		SysCtlDelay(500 * ulClockMS);
 
 		HWREG(GPIO_PORTE_BASE + GPIO_O_DATA + (GPIO_PIN_0 << 2)) = GPIO_PIN_0;
-		SysCtlDelay(500 * ulClockMS);
+		SysCtlDelay(500 * ulClockMS);*/
 	}
 }

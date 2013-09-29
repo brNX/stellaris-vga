@@ -15,7 +15,7 @@ static void IntDefaultHandler(void);
 //*****************************************************************************
 extern int main(void);
 
-extern void VsyncHandler(void);
+//extern void VsyncHandler(void);
 extern void HsyncHandler(void);
 extern void FrameHandler(void);
 
@@ -80,7 +80,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // SSI0 Rx and Tx
     IntDefaultHandler,                      // I2C0 Master and Slave
     IntDefaultHandler,                      // PWM Fault
-    VsyncHandler,                      	   // PWM Generator 0
+    IntDefaultHandler,                      	   // PWM Generator 0
     HsyncHandler,                     		   // PWM Generator 1
     FrameHandler,                      	   // PWM Generator 2
     IntDefaultHandler,                      // QEI 0

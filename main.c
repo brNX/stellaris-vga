@@ -80,10 +80,20 @@ void HsyncHandler(){
 		tilesrowsadress[i]=&kakariko[currenttilerow];
 		mapindex++; //increment mapindex for next tile
 		currenttilerow= (*mapindex*TILEOFFSET)+(tilerowoffset*TILEWIDTH);
-	    tilesrowsadress[i+1]=&kakariko[currenttilerow];
-	    mapindex++; //increment mapindex for next tile
+		tilesrowsadress[i+1]=&kakariko[currenttilerow];
+		mapindex++; //increment mapindex for next tile
 	}
 
+
+
+
+
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
 	asm volatile("nop");
 	asm volatile("nop");
 	asm volatile("nop");

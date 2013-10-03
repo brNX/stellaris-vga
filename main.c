@@ -14,6 +14,7 @@
 #include <inc/hw_memmap.h>
 #include <inc/hw_gpio.h>
 #include <inc/hw_pwm.h>
+
 #include <driverlib/rom.h>
 #include <driverlib/rom_map.h>
 #include <driverlib/debug.h>
@@ -83,10 +84,6 @@ void HsyncHandler(){
 		tilesrowsadress[i+1]=&kakariko[currenttilerow];
 		mapindex++; //increment mapindex for next tile
 	}
-
-
-
-
 
 	asm volatile("nop");
 	asm volatile("nop");
